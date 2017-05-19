@@ -100,7 +100,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   RootNode* root = RootNode::getInstance();
   root->addChild(new LedNode());
-  PwmNode* pwm = new PwmNode(&htim2, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3);
+  PwmNode* pwm = new PwmNode(&htim2, TIM_CHANNEL_3, TIM_CHANNEL_2, TIM_CHANNEL_4);
   pwm->init();
   root->addChild(pwm);
 

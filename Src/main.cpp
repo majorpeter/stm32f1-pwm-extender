@@ -54,6 +54,7 @@
 
 #include "mprotocol-nodes/RootNode.h"
 #include "LedNode.h"
+#include "PwmNode.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -97,16 +98,11 @@ int main(void)
   MX_TIM2_Init();
 
   /* USER CODE BEGIN 2 */
-  RootNode::getInstance()->addChild(new LedNode());
-
-  htim2.Init.Period = (0x1000 - 1);
-  HAL_TIM_Base_Init(&htim2);
-
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
-  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
-
-  HAL_TIM_Base_Start(&htim2);
+  RootNode* root = RootNode::getInstance();
+  root->addChild(new LedNode());
+  PwmNode* pwm = new PwmNode(&htim2, TIM_CHANNEL_1, TIM_CHANNEL_2, TIM_CHANNEL_3);
+  pwm->init();
+  root->addChild(pwm);
 
   VcpSerialInterface* serialInterface = new VcpSerialInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS, 512);
   ProtocolParser* protocolParser = new ProtocolParser(serialInterface);

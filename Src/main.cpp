@@ -51,6 +51,9 @@
 #include "usbd_cdc_if.h"
 #include "mprotocol-server/ProtocolParser.h"
 #include "mprotocol-iface-stm32-vcp/VcpSerialInterface.h"
+
+#include "mprotocol-nodes/RootNode.h"
+#include "LedNode.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -94,6 +97,8 @@ int main(void)
   MX_TIM2_Init();
 
   /* USER CODE BEGIN 2 */
+  RootNode::getInstance()->addChild(new LedNode());
+
   htim2.Init.Period = (0x1000 - 1);
   HAL_TIM_Base_Init(&htim2);
 

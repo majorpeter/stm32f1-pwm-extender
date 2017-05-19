@@ -1,0 +1,9 @@
+[submodule "Libs/mprotocol-server"]
+	path = Libs/mprotocol-server
+	url = https://github.com/majorpeter/mprotocol-server.git
+[submodule "Libs/mprotocol-nodes"]
+	path = Libs/mprotocol-nodes
+	url = https://github.com/majorpeter/mprotocol-nodes.git
+[submodule "Drivers/mprotocol-iface-stm32-vcp"]
+	path = Drivers/mprotocol-iface-stm32-vcp
+	url = https://github.com/majorpeter/mprotocol-iface-stm32-vcp.git

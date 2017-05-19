@@ -49,6 +49,8 @@
 
 /* USER CODE BEGIN Includes */
 #include "usbd_cdc_if.h"
+#include "mprotocol-server/ProtocolParser.h"
+#include "mprotocol-iface-stm32-vcp/VcpSerialInterface.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -70,7 +72,7 @@ void Error_Handler(void);
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
-
+extern "C"
 int main(void)
 {
 
@@ -99,11 +101,12 @@ int main(void)
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
 
-  htim2.Instance->CCR1 = 0x500;
-  htim2.Instance->CCR2 = 0x100;
-  htim2.Instance->CCR3 = 0x900;
-
   HAL_TIM_Base_Start(&htim2);
+
+  VcpSerialInterface* serialInterface = new VcpSerialInterface(&hUsbDeviceFS, &USBD_Interface_fops_FS, 512);
+  ProtocolParser* protocolParser = new ProtocolParser(serialInterface);
+  serialInterface->listen();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -114,29 +117,7 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-	  uint8_t* buffer;
-	  int bytes_count = circular_buffer_get_contiguous_data(&usb_cdc_rx_buffer, &buffer);
-	  if (bytes_count > 0) {
-		  switch (*buffer) {
-		  case '1':
-		  case 'y':
-			  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
-			  break;
-		  case '0':
-		  case 'n':
-			  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
-			  break;
-		  case ' ':
-		  case '\r':
-		  case '\n':
-			  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-			  break;
-		  }
-
-		  CDC_Transmit_FS((uint8_t*) "\r\nEcho: ", 8);
-		  CDC_Transmit_FS(buffer, bytes_count);
-		  circular_buffer_drop_bytes(&usb_cdc_rx_buffer, bytes_count);
-	  }
+	  protocolParser->handler();
   }
   /* USER CODE END 3 */
 

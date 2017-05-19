@@ -48,7 +48,7 @@
 #include "gpio.h"
 
 /* USER CODE BEGIN Includes */
-
+#include "usbd_cdc_if.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -99,12 +99,33 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
+	  uint8_t* buffer;
+	  int bytes_count = circular_buffer_get_contiguous_data(&usb_cdc_rx_buffer, &buffer);
+	  if (bytes_count > 0) {
+		  switch (*buffer) {
+		  case '1':
+		  case 'y':
+			  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+			  break;
+		  case '0':
+		  case 'n':
+			  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+			  break;
+		  case ' ':
+		  case '\r':
+		  case '\n':
+			  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+			  break;
+		  }
 
+		  CDC_Transmit_FS((uint8_t*) "\r\nEcho: ", 8);
+		  CDC_Transmit_FS(buffer, bytes_count);
+		  circular_buffer_drop_bytes(&usb_cdc_rx_buffer, bytes_count);
+	  }
   }
   /* USER CODE END 3 */
 

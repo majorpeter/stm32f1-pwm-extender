@@ -92,7 +92,18 @@ int main(void)
   MX_TIM2_Init();
 
   /* USER CODE BEGIN 2 */
+  htim2.Init.Period = (0x1000 - 1);
+  HAL_TIM_Base_Init(&htim2);
 
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+
+  htim2.Instance->CCR1 = 0x500;
+  htim2.Instance->CCR2 = 0x100;
+  htim2.Instance->CCR3 = 0x900;
+
+  HAL_TIM_Base_Start(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
